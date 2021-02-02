@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml"
+  version="1.0"
+  datamodel="crystal"
+  name="medium"
+  initial="1A"> 
+
+  <datamodel>
+  </datamodel>
+  <state id="1A">
+    <transition event="T1b" target="1B"/>
+  </state>
+  <state id="1B">
+    <initial>
+      <transition target="2A"/>
+    </initial>
+    <transition event="T1a" target="1A"/>
+
+    <state id="2A">
+      <transition event="T2b" target="2B"/>
+    </state>
+    <parallel id="2B">
+      <transition event="T2a" target="2A"/>
+      <state id="2.5A">
+        <initial>
+          <transition target="3A"/>
+        </initial>
+
+        <state id="3A">
+          <transition event="T3b" target="3B"/>
+        </state>
+        <state id="3B">
+          <transition event="T3a" target="3A"/>
+        </state>
+      </state>
+      <state id="2.5B">
+        <initial>
+          <transition target="3C"/>
+        </initial>
+
+        <state id="3C">
+          <transition event="T3d" target="3D"/>
+        </state>
+        <parallel id="3D">
+          <transition event="T3c" target="3C"/>
+          <state id="3.5A">
+            <initial>
+              <transition target="4A"/>
+            </initial>
+
+            <state id="4A">
+              <transition event="T4b" target="4B"/>
+            </state>
+            <state id="4B">
+              <transition event="T4a" target="4A"/>
+            </state>
+          </state>
+          <state id="3.5B">
+            <initial>
+              <transition target="4C"/>
+            </initial>
+
+            <state id="4C">
+              <transition event="T4d" target="4D"/>
+            </state>
+            <state id="4D">
+              <transition event="T4c" target="4C"/>
+            </state>
+          </state>
+        </parallel>
+      </state>
+    </parallel>
+  </state>
+</scxml>

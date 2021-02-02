@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" datamodel="ruby" initial="Systems" name="MachineTool">
+  <datamodel>
+  </datamodel>
+  <parallel id="Systems">
+    <state id="SD">
+      <initial>
+        <transition target="SD.Intermediate"/>
+      </initial>
+      <state id="SD.Intermediate">
+        <transition event="Open" target="SD.Opened" cond="In('ES.Normal')"/>
+        <transition event="Close" target="SD.Closed" cond="In('ES.Normal')"/>
+      </state>
+      <state id="SD.Opened">
+        <transition event="Close" target="SD.Intermediate" cond="In('ES.Normal')"/>
+      </state>
+      <state id="SD.Closed">
+        <transition event="Open" target="SD.Intermediate" cond="In('ES.Normal')"/>
+      </state>
+    </state>
+    <state id="ES">
+      <initial>
+        <transition target="ES.Triggered"/>
+      </initial>
+      <state id="ES.Normal">
+        <transition target="ES.Triggered"/>
+      </state>
+      <state id="ES.Triggered">
+        <transition target="ES.Normal"/>
+      </state>
+    </state>
+  </parallel>
+</scxml>

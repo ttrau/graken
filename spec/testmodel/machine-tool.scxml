@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" datamodel="ruby" initial="MachineTool" name="MachineTool">
+  <datamodel>
+    <data id="ClampingSystem_opened" expr="false"/>
+    <data id="ClampingSystem_closed" expr="false"/>
+    <data id="ClampingSystem_open" expr="false"/>
+    <data id="ClampingSystem_close" expr="false"/>
+    <data id="SideDoor_opened" expr="false"/>
+    <data id="SideDoor_closed" expr="false"/>
+    <data id="SideDoor_open" expr="false"/>
+    <data id="SideDoor_close" expr="false"/>
+    <data id="NumericalControl_active" expr="false"/>
+    <data id="NumericalControl_stopped" expr="false"/>
+    <data id="NumericalControl_interrupted" expr="false"/>
+    <data id="NumericalControl_cancelled" expr="false"/>
+    <data id="NumericalControl_start" expr="false"/>
+    <data id="NumericalControl_stop" expr="false"/>
+    <data id="NumericalControl_reset" expr="false"/>
+    <data id="FrontDoor_opened" expr="false"/>
+    <data id="FrontDoor_closed" expr="false"/>
+    <data id="AuxiliaryDrives_active" expr="false"/>
+    <data id="AuxiliaryDrives_turn_on" expr="false"/>
+    <data id="AuxiliaryDrives_turn_off" expr="false"/>
+    <data id="EmergencyStop_normal" expr="false"/>
+    <data id="HandlingKeyswitch_active" expr="false"/>
+    <data id="OperationMode_auto_active" expr="false"/>
+    <data id="OperationMode_mda_active" expr="false"/>
+    <data id="OperationMode_jog_active" expr="false"/>
+    <data id="OperationMode_auto" expr="false"/>
+    <data id="OperationMode_mda" expr="false"/>
+    <data id="OperationMode_jog" expr="false"/>
+    <data id="TransferPosition_reached" expr="false"/>
+    <data id="MachiningTable_occupied" expr="false"/>
+  </datamodel>
+  <state id="MachineTool">
+    <parallel id="Systems">
+      <state id="ClampingSystem" label="ClampingSystem">
+        <state id="ClampingSystem.Intermediate" label="Intermediate">
+          <transition event="Open" target="ClampingSystem.Unclamped" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('TransferPosition.Reached')" type="2"/>
+          <transition event="Close" target="ClampingSystem.Clamped" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('TransferPosition.Reached') &amp;&amp; In('MachiningTable.Occupied') &amp;&amp; In('RobotHandling.Table')" type="2"/>
+        </state>
+        <state id="ClampingSystem.Unclamped" label="Unclamped">
+          <transition event="Close" target="ClampingSystem.Intermediate" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('TransferPosition.Reached') &amp;&amp; In('MachiningTable.Occupied') &amp;&amp; In('RobotHandling.Table')" type="2"/>
+        </state>
+        <state id="ClampingSystem.Clamped" label="Clamped">
+          <transition event="Open" target="ClampingSystem.Intermediate" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('TransferPosition.Reached')" type="2"/>
+        </state>
+      </state>
+      <state id="SideDoor" label="SideDoor">
+        <state id="SideDoor.Intermediate" label="Intermediate">
+          <transition event="Open" target="SideDoor.Opened" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="2"/>
+          <transition event="Close" target="SideDoor.Closed" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('RobotHandling.Outside')" type="2"/>
+        </state>
+        <state id="SideDoor.Opened" label="Opened">
+          <transition event="Close" target="SideDoor.Intermediate" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('RobotHandling.Outside')" type="2"/>
+        </state>
+        <state id="SideDoor.Closed" label="Closed">
+          <transition event="Open" target="SideDoor.Intermediate" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="2"/>
+        </state>
+      </state>
+      <state id="NumericalControl" label="NumericalControl">
+        <state id="NumericalControl.Ready" label="Ready">
+          <transition event="Start" target="NumericalControl.Running" cond="In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('ClampingSystem.Clamped') &amp;&amp; In('SideDoor.Closed') &amp;&amp; In('FrontDoor.Closed') &amp;&amp; In('AuxiliaryDrives.On') &amp;&amp; In('MachiningTable.Occupied')" type="2"/>
+        </state>
+        <state id="NumericalControl.Stopped" label="Stopped">
+          <transition event="Start" target="NumericalControl.Running" cond="In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('ClampingSystem.Clamped') &amp;&amp; In('SideDoor.Closed') &amp;&amp; In('FrontDoor.Closed') &amp;&amp; In('AuxiliaryDrives.On') &amp;&amp; In('MachiningTable.Occupied')" type="2"/>
+          <transition event="Reset" target="NumericalControl.Ready" cond="In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="2"/>
+        </state>
+        <state id="NumericalControl.Running" label="Running">
+          <transition event="Stop" target="NumericalControl.Stopped" cond="In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="2"/>
+          <transition target="NumericalControl.Finished" cond="NumericalControl_cancelled &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="1"/>
+        </state>
+        <state id="NumericalControl.Finished" label="Finished">
+          <transition event="Reset" target="NumericalControl.Ready" cond="In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="2"/>
+        </state>
+      </state>
+      <state id="FrontDoor" label="FrontDoor">
+        <state id="FrontDoor.Intermediate" label="Intermediate">
+          <transition target="FrontDoor.Opened" cond="FrontDoor_opened &amp;&amp; !In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="1"/>
+          <transition target="FrontDoor.Closed" cond="FrontDoor_closed &amp;&amp; !In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="1"/>
+        </state>
+        <state id="FrontDoor.Opened" label="Opened">
+          <transition target="FrontDoor.Intermediate" cond="!FrontDoor_opened &amp;&amp; !In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="1"/>
+        </state>
+        <state id="FrontDoor.Closed" label="Closed">
+          <transition target="FrontDoor.Intermediate" cond="!FrontDoor_closed &amp;&amp; !In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="1"/>
+        </state>
+      </state>
+      <state id="AuxiliaryDrives" label="AuxiliaryDrives">
+        <state id="AuxiliaryDrives.Off" label="Off">
+          <transition event="TurnOn" target="AuxiliaryDrives.On" cond="In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="2"/>
+        </state>
+        <state id="AuxiliaryDrives.On" label="On">
+          <transition event="TurnOff" target="AuxiliaryDrives.Off" cond="In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto')" type="2"/>
+        </state>
+      </state>
+      <state id="EmergencyStop" label="EmergencyStop">
+        <state id="EmergencyStop.Normal" label="Normal">
+          <transition target="EmergencyStop.Triggered" cond="!EmergencyStop_normal" type="1"/>
+        </state>
+        <state id="EmergencyStop.Triggered" label="Triggered">
+          <transition target="EmergencyStop.Normal" cond="EmergencyStop_normal" type="1"/>
+        </state>
+      </state>
+      <state id="HandlingKeyswitch" label="HandlingKeyswitch">
+        <state id="HandlingKeyswitch.Off" label="Off">
+          <transition target="HandlingKeyswitch.On" cond="HandlingKeyswitch_active" type="1"/>
+        </state>
+        <state id="HandlingKeyswitch.On" label="On">
+          <transition target="HandlingKeyswitch.Off" cond="!HandlingKeyswitch_active" type="1"/>
+        </state>
+      </state>
+      <state id="OperationMode" label="OperationMode">
+        <state id="OperationMode.Jog" label="Jog">
+          <transition event="Auto" target="OperationMode.Auto" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On')" type="2"/>
+          <transition event="MDA" target="OperationMode.MDA" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On')" type="2"/>
+        </state>
+        <state id="OperationMode.Auto" label="Auto">
+          <transition event="Jog" target="OperationMode.Jog" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On')" type="2"/>
+          <transition event="MDA" target="OperationMode.MDA" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On')" type="2"/>
+        </state>
+        <state id="OperationMode.MDA" label="MDA">
+          <transition event="Auto" target="OperationMode.Auto" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On')" type="2"/>
+          <transition event="Jog" target="OperationMode.Jog" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On')" type="2"/>
+        </state>
+      </state>
+      <state id="TransferPosition" label="TransferPosition">
+        <state id="TransferPosition.NotReached" label="NotReached">
+          <transition target="TransferPosition.Reached" cond="TransferPosition_reached" type="1"/>
+        </state>
+        <state id="TransferPosition.Reached" label="Reached">
+          <transition target="TransferPosition.NotReached" cond="!TransferPosition_reached" type="1"/>
+        </state>
+      </state>
+      <state id="MachiningTable" label="MachiningTable">
+        <state id="MachiningTable.Empty" label="Empty">
+          <transition target="MachiningTable.Occupied" cond="MachiningTable_occupied &amp;&amp; !In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('RobotHandling.Table') &amp;&amp; In('RobotLoad.Occupied')" type="1"/>
+        </state>
+        <state id="MachiningTable.Occupied" label="Occupied">
+          <transition target="MachiningTable.Empty" cond="!MachiningTable_occupied &amp;&amp; !In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal') &amp;&amp; In('HandlingKeyswitch.On') &amp;&amp; In('OperationMode.Auto') &amp;&amp; In('RobotHandling.Table') &amp;&amp; In('RobotLoad.Empty')" type="1"/>
+        </state>
+      </state>
+    </parallel>
+  </state>
+</scxml>

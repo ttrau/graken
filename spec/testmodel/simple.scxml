@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml"
+  version="1.0"
+  datamodel="crystal"
+  name="simple"
+  initial="simple"> 
+
+  <datamodel>
+  </datamodel>
+  <state id="C">
+    <transition event="Tcr" target="simple"/>
+  </state>
+  <parallel id="simple">
+    <transition event="Tc" target="C"/>
+    <state id="A">
+      <initial>
+        <transition target="A1"/>
+      </initial>
+      <state id="A1">
+        <transition event="Ta" target="A2"/>
+      </state>
+      <state id="A2">
+        <transition event="Tar" target="A1"/>
+      </state>
+    </state>
+    <state id="B">
+      <initial>
+        <transition target="B1"/>
+      </initial>
+      <state id="B1">
+        <transition event="Tb" target="B2"/>
+      </state>
+      <state id="B2">
+        <transition event="Tbr" target="B1"/>
+      </state>
+    </state>
+  </parallel>
+</scxml>

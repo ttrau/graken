@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" datamodel="ruby" initial="MachineTool" name="MachineTool">
+  <datamodel>
+  </datamodel>
+  <state id="MachineTool">
+    <parallel id="Systems">
+      <state id="ClampingSystem" label="ClampingSystem">
+        <state id="ClampingSystem.Intermediate" label="Intermediate">
+          <transition event="Open" target="ClampingSystem.Unclamped" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal')" type="2"/>
+          <transition event="Close" target="ClampingSystem.Clamped" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal')" type="2"/>
+        </state>
+        <state id="ClampingSystem.Unclamped" label="Unclamped">
+          <transition event="Close" target="ClampingSystem.Intermediate" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal')" type="2"/>
+        </state>
+        <state id="ClampingSystem.Clamped" label="Clamped">
+          <transition event="Open" target="ClampingSystem.Intermediate" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal')" type="2"/>
+        </state>
+      </state>
+      <state id="SideDoor" label="SideDoor">
+        <state id="SideDoor.Intermediate" label="Intermediate">
+          <transition event="Open" target="SideDoor.Opened" type="2"/>
+          <transition event="Close" target="SideDoor.Closed" type="2"/>
+        </state>
+        <state id="SideDoor.Opened" label="Opened">
+          <transition event="Close" target="SideDoor.Intermediate" type="2"/>
+        </state>
+        <state id="SideDoor.Closed" label="Closed">
+          <transition event="Open" target="SideDoor.Intermediate" cond="!In('NumericalControl.Active') &amp;&amp; In('EmergencyStop.Normal')" type="2"/>
+        </state>
+      </state>
+      <state id="NumericalControl" label="NumericalControl">
+        <state id="NumericalControl.Ready" label="Ready">
+          <transition event="Start" target="NumericalControl.Running" cond="In('ES.Normal') &amp;&amp; In('ClampingSystem.Clamped') &amp;&amp; In('SideDoor.Closed') &amp;&amp; In('FrontDoor.Closed') &amp;&amp; In('AuxiliaryDrives.On')" type="2"/>
+        </state>
+        <state id="NumericalControl.Stopped" label="Stopped">
+          <transition event="Start" target="NumericalControl.Running" cond="In('ES.Normal') &amp;&amp; In('ClampingSystem.Clamped') &amp;&amp; In('SideDoor.Closed') &amp;&amp; In('FrontDoor.Closed') &amp;&amp; In('AuxiliaryDrives.On')" type="2"/>
+          <transition event="Reset" target="NumericalControl.Ready" type="2"/>
+        </state>
+        <state id="NumericalControl.Running" label="Running">
+          <transition event="Stop" target="NumericalControl.Stopped" type="2"/>
+          <transition target="NumericalControl.Finished" cond="NumericalControl_cancelled" type="1"/>
+        </state>
+        <state id="NumericalControl.Finished" label="Finished">
+          <transition event="Reset" target="NumericalControl.Ready" type="2"/>
+        </state>
+      </state>
+      <state id="FrontDoor" label="FrontDoor">
+        <state id="FrontDoor.Intermediate" label="Intermediate">
+          <transition target="FrontDoor.Opened" cond="FrontDoor_opened" type="1"/>
+          <transition target="FrontDoor.Closed" cond="FrontDoor_closed" type="1"/>
+        </state>
+        <state id="FrontDoor.Opened" label="Opened">
+          <transition target="FrontDoor.Intermediate" cond="!FrontDoor_opened" type="1"/>
+        </state>
+        <state id="FrontDoor.Closed" label="Closed">
+          <transition target="FrontDoor.Intermediate" cond="!FrontDoor_closed" type="1"/>
+        </state>
+      </state>
+      <state id="AuxiliaryDrives" label="AuxiliaryDrives">
+        <state id="AuxiliaryDrives.Off" label="Off">
+          <transition event="TurnOn" target="AuxiliaryDrives.On" type="2"/>
+        </state>
+        <state id="AuxiliaryDrives.On" label="On">
+          <transition event="TurnOff" target="AuxiliaryDrives.Off" type="2"/>
+        </state>
+      </state>
+      <state id="EmergencyStop" label="EmergencyStop">
+        <state id="EmergencyStop.Normal" label="Normal">
+          <transition target="EmergencyStop.Triggered" cond="!EmergencyStop_normal" type="1"/>
+        </state>
+        <state id="EmergencyStop.Triggered" label="Triggered">
+          <transition target="EmergencyStop.Normal" cond="EmergencyStop_normal" type="1"/>
+        </state>
+      </state>
+      <state id="HandlingKeyswitch" label="HandlingKeyswitch">
+        <state id="HandlingKeyswitch.Off" label="Off">
+          <transition target="HandlingKeyswitch.On" cond="HandlingKeyswitch_active" type="1"/>
+        </state>
+        <state id="HandlingKeyswitch.On" label="On">
+          <transition target="HandlingKeyswitch.Off" cond="!HandlingKeyswitch_active" type="1"/>
+        </state>
+      </state>
+      <state id="OperationMode" label="OperationMode">
+        <state id="OperationMode.Jog" label="Jog">
+          <transition event="Auto" target="OperationMode.Auto" type="2"/>
+          <transition event="MDA" target="OperationMode.MDA" type="2"/>
+        </state>
+        <state id="OperationMode.Auto" label="Auto">
+          <transition event="Jog" target="OperationMode.Jog" type="2"/>
+          <transition event="MDA" target="OperationMode.MDA" type="2"/>
+        </state>
+        <state id="OperationMode.MDA" label="MDA">
+          <transition event="Auto" target="OperationMode.Auto" type="2"/>
+          <transition event="Jog" target="OperationMode.Jog" type="2"/>
+        </state>
+      </state>
+      <state id="TransferPosition" label="TransferPosition">
+        <state id="TransferPosition.NotReached" label="NotReached">
+          <transition target="TransferPosition.Reached" cond="TransferPosition_reached" type="1"/>
+        </state>
+        <state id="TransferPosition.Reached" label="Reached">
+          <transition target="TransferPosition.NotReached" cond="!TransferPosition_reached" type="1"/>
+        </state>
+      </state>
+      <state id="MachiningTable" label="MachiningTable">
+        <state id="MachiningTable.Empty" label="Empty">
+          <transition target="MachiningTable.Occupied" cond="MachiningTable_occupied" type="1"/>
+        </state>
+        <state id="MachiningTable.Occupied" label="Occupied">
+          <transition target="MachiningTable.Empty" cond="!MachiningTable_occupied" type="1"/>
+        </state>
+      </state>
+    </parallel>
+  </state>
+</scxml>
