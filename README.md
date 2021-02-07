@@ -3,6 +3,13 @@
 A library and command line tool for flattening and validation of hierarchical and concurrent/parallel graphs (mainly `.scxml` state charts), written in crystal.
 This library takes advantage of the graph's [ken](https://www.dictionary.com/browse/ken) (gra~~ph~~ken - the guard dependencies of parallel states in `.scxml`) to identify feasible edges and necessary triggers to reach a target state.
 
+## Thesis
+
+```sh
+graken -l 3 -v -a -e ts/graken.graph < spec/testmodel/cell-extended.xml > ts/graken.log
+graken -l 3 -v -a -o -e ts/graken-extern.graph < spec/testmodel/cell-extended.xml > ts/graken-extern.log
+```
+
 ## Installation
 
 Install crystal-lang
